@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TARUMT Chatbot Admin Login</title>
+    <link href="{% static 'css/login.css' %}" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
+
+</head>
+<body class="d-flex align-items-center py-4">
+    <main class="login-container w-100 m-auto p-4" style="max-width: 400px;">
+        <div class="text-center mb-4">
+            <img src="{% static 'picture/logo.png' %}" alt="TARUMT Logo" class="logo-img">
+            <h1 class="h3 mb-3 fw-normal">Chatbot Admin Login</h1>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-floating mb-3">
+                <input type="text" name="username" class="form-control" id="floatingInput" placeholder="Username">
+                <label for="floatingInput">Staff ID</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Password">
+                <label for="floatingPassword">Password</label>
+            </div>
+
+            <button class="w-100 btn btn-primary btn-lg mb-4" type="submit">Login</button>
+
+            <p class="text-center text-muted mt-3 mb-0">
+                <small>© 2024 TARUMT Chatbot Administration System</small>
+            </p>
+        </form>
+    </main>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

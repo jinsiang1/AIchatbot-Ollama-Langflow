@@ -1,0 +1,126 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}
+    {% endblock %}</title>
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+</head>
+<body>
+<!-- Top Navigation Bar -->
+<nav class="navbar top-bar navbar-light border-bottom px-4 py-0">
+    <div class="container-fluid">
+        <!-- TARUMT Logo -->
+        <a class="navbar-brand d-flex align-items-center">
+            <img src="{% static 'picture/logo.png' %}" alt="TARUMT Logo" height="40">
+        </a>
+
+            <!-- User Profile Dropdown -->
+            <div class="dropdown">
+                <button class="user-profile d-flex align-items-center gap-2" type="button" id="userDropdown"
+                        data-bs-toggle="dropdown">
+                    <img src="{% static 'picture/admin.png' %}" alt="Profile" class="rounded-circle" width="40" height="40">
+                    <div class="d-none d-md-block text-start">
+                        <div class="fw-bold">Admin User</div>
+                        <div class="text-muted small">Administrator</div>
+                    </div>
+                    <i class="fas fa-chevron-down ms-2 text-muted"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2">
+                    <li><a class="dropdown-item py-2 text-danger" href="{% url 'user:logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar Navigation -->
+        <nav class="col-md-3 col-lg-2 d-md-block sidebar px-0">
+            <div class="position-sticky pt-4">
+                <ul class="nav flex-column px-3">
+                    {% if user.is_superuser %}
+                    <li class="nav-item mt-2">
+                        <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#staffSubmenu">
+                            <i class="fas fa-users me-2"></i>
+                            Staff Management
+                            <i class="fas fa-chevron-down float-end mt-1"></i>
+                        </a>
+                        <div class="collapse hide" id="staffSubmenu">
+                            <ul class="nav flex-column ms-3 mt-2">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'user:register_staff' %}">
+                                        <i class="fas fa-plus me-2"></i>Add Staff
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'user:user_list' %}">
+                                        <i class="fas fa-trash me-2"></i>Delete Staff
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    {% endif %}
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'chatbot:chathistory_panel' %}">
+                            <i class="fas fa-home me-2"></i>
+                            Chat History
+                        </a>
+                    </li>
+
+                    <li class="nav-item mt-2">
+                        <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#chatbotSubmenu">
+                            <i class="fas fa-users me-2"></i>
+                            Chatbot Train File
+                            <i class="fas fa-chevron-down float-end mt-1"></i>
+                        </a>
+                        <div class="collapse hide" id="chatbotSubmenu">
+                            <ul class="nav flex-column ms-3 mt-2">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'user:upload_pdf_page' %}">
+                                        <i class="fas fa-plus me-2"></i>Upload File
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'user:view_pdfs' %}">
+                                        <i class="fas fa-edit me-2"></i>Delete File
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+
+        <!-- Main Content Area -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="pt-4 pb-2">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </main>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container-fluid">
+        <p class="copyright mb-0">
+            © 2024 TARUMT Chatbot Admin Dashboard. All rights reserved.
+        </p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

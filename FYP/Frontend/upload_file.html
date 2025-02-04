@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}
+    Upload PDF
+{% endblock %}
+{% block content %}
+<div class="card p-4 mx-auto" style="max-width: 600px; margin-top: 20px;">
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" role="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+    {% if success %}
+    <div class="alert alert-success" role="alert">
+        {{ success }}
+    </div>
+    {% endif %}
+    {% if error %}
+    <div class="alert alert-danger" role="alert">
+        {{ error }}
+    </div>
+    {% endif %}
+    <div class="container">
+        <div class="header">
+            <h1>Upload PDF</h1>
+            <p>Max file size: 20 MB each</p>
+        </div>
+        <form method="POST" enctype="multipart/form-data" action="{% url 'user:upload_pdf' %}">
+            {% csrf_token %}
+            <div class="form-group mb-3">
+                <label for="file">Select PDF File:</label>
+                <input type="file" name="file" accept="application/pdf" class="form-control" required />
+            </div>
+            <button type="submit" class="btn btn-primary">Upload</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

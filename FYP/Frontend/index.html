@@ -1,0 +1,553 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAR UMT Chat Widget</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        body{
+            background-image: url({% static 'picture/bg.jpg' %});
+            background-repeat:no-repeat;
+    background-size:100% 100vh;
+        }
+        .chat-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .chat-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50% !important;
+            background-color: #FFD700 !important;
+            border: none !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            color: #000 !important;
+        }
+
+        .chat-button:hover {
+            transform: scale(1.1);
+            background-color: #FFC800 !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .chat-box {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 450px;
+            height: 700px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            transform: scale(0);
+            opacity: 0;
+            transform-origin: bottom right;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-box.active {
+            transform: scale(1);
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #FFD700 0%, #FFC800 100%);
+            color: #000;
+            border-radius: 10px 10px 0 0;
+            padding: 15px;
+        }
+
+        .header-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .header-tools {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .tool-button {
+            background: none;
+            border: none;
+            color: #000;
+            cursor: pointer;
+            padding: 5px 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .tool-button:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+        }
+
+        .close-button {
+            background: none;
+            border: none;
+            color: #000;
+            cursor: pointer;
+            padding: 5px;
+            transition: all 0.3s ease;
+            border-radius: 50%;
+        }
+
+        .close-button:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background-color: #f8f9fa;
+        }
+
+        .message {
+            display: flex;
+            flex-direction: column;
+            max-width: 80%;
+        }
+
+        .bot-message {
+            align-self: flex-start;
+        }
+
+        .user-message {
+            align-self: flex-end;
+        }
+
+        .message-content {
+            padding: 12px 18px;
+            border-radius: 20px;
+            position: relative;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            line-height: 1.5;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .bot-message .message-content {
+            background-color: white;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .user-message .message-content {
+            background-color: #FFD700;
+            border-bottom-right-radius: 5px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .bot-message .message-time {
+            margin-left: 8px;
+        }
+
+        .user-message .message-time {
+            text-align: right;
+            margin-right: 8px;
+        }
+
+        .chat-input {
+            border-top: 1px solid #dee2e6;
+            background-color: #fff;
+            border-radius: 0 0 10px 10px;
+            padding: 15px;
+        }
+
+        .chat-input form {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input .form-control {
+            border-radius: 20px;
+            padding-left: 20px;
+            padding-right: 20px;
+            border: 1px solid #dee2e6;
+        }
+
+        .chat-input .form-control:focus {
+            box-shadow: none;
+            border-color: #FFD700;
+        }
+
+        .chat-input button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50% !important;
+            background-color: #FFD700 !important;
+            color: #000 !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none !important;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input button:hover {
+            background-color: #FFC800 !important;
+            transform: scale(1.1);
+        }
+
+        /* Custom scrollbar */
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #FFD700;
+            border-radius: 3px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #FFC800;
+        }
+
+        @keyframes messageAppear {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message {
+            animation: messageAppear 0.3s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-widget">
+        <!-- Chat Button -->
+        <button class="btn chat-button" id="chatButton">
+            <i class="fas fa-comment fs-4"></i>
+        </button>
+
+        <!-- Chat Box -->
+        <div class="chat-box" id="chatBox">
+            <!-- Header -->
+            <div class="chat-header">
+                <div class="header-main">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-robot me-2"></i>
+                        <h5 class="mb-0">TAR BOT: Assist for better information </h5>
+                    </div>
+                    <button class="close-button" id="closeChat">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="header-tools">
+                    <button class="tool-button" id="faqButton">
+                        <i class="fas fa-question-circle"></i>
+                        FAQ
+                    </button>
+                    <button class="tool-button" id="feedbackButton">
+                        <i class="fas fa-comment-dots"></i>
+                        Feedback
+                    </button>
+                </div>
+            </div>
+
+            <!-- Messages Area -->
+            <div class="chat-messages" id="chatMessages"></div>
+
+            <!-- Input Area -->
+            <div class="chat-input">
+                <form id="chatForm">
+                    <input type="text" class="form-control" placeholder="Type your message..." id="messageInput">
+                    <button type="submit">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+    // Ask if user is a TAR UMT student
+document.addEventListener("DOMContentLoaded", function () {
+    const chatButton = document.getElementById("chatButton");
+    const chatBox = document.getElementById("chatBox");
+    const closeChat = document.getElementById("closeChat");
+    const chatMessages = document.getElementById("chatMessages");
+    const messageInput = document.getElementById("messageInput");
+    const chatForm = document.getElementById("chatForm");
+    const faqButton = document.getElementById("faqButton");
+    const feedbackButton = document.getElementById("feedbackButton");
+
+    // Open chat
+    chatButton.addEventListener("click", () => {
+        chatBox.classList.add("active");
+        messageInput.focus();
+        chatButton.style.display = "none";
+    });
+
+    // Close chat
+    closeChat.addEventListener("click", () => {
+        chatBox.classList.remove("active");
+        chatButton.style.display = "block";
+    });
+
+    // Handle message submission
+             chatForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const message = messageInput.value.trim();
+
+                if (message) {
+                    // Add user message
+                    addMessage(message, 'user');
+                    messageInput.value = '';
+
+                    // Simulate bot response
+                    setTimeout(() => {
+                        fetchBotResponse(message);
+                    }, 500);
+                }
+             });
+
+    function addMessage(text, sender) {
+        const messageDiv = document.createElement("div");
+        messageDiv.classList.add("message", `${sender}-message`);
+
+        const messageContent = document.createElement("div");
+        messageContent.classList.add("message-content");
+        messageContent.textContent = text;
+
+        messageDiv.appendChild(messageContent);
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function addDropdown(header, options) {
+        addMessage(header, "bot");
+
+        const dropdownDiv = document.createElement("div");
+        dropdownDiv.style.marginTop = "10px";
+        dropdownDiv.style.display = "flex";
+        dropdownDiv.style.flexDirection = "column";
+        dropdownDiv.style.alignItems = "flex-start";
+
+        // Create a label for the dropdown
+        const label = document.createElement("label");
+        label.textContent = "Select an option:";
+        label.style.marginBottom = "5px";
+
+        // Create the dropdown element
+        const dropdown = document.createElement("select");
+        dropdown.classList.add("form-select");
+        dropdown.style.minWidth = "200px";
+
+        // Add an initial placeholder option
+        const placeholderOption = document.createElement("option");
+        placeholderOption.textContent = "Choose an option...";
+        placeholderOption.value = "";
+        placeholderOption.disabled = true;
+        placeholderOption.selected = true;
+        dropdown.appendChild(placeholderOption);
+
+        // Add options to the dropdown
+        options.forEach((option, index) => {
+            const optionElement = document.createElement("option");
+            optionElement.textContent = option.text;
+            optionElement.value = index;
+            dropdown.appendChild(optionElement);
+        });
+
+        // Append the label and dropdown to the div
+        dropdownDiv.appendChild(label);
+        dropdownDiv.appendChild(dropdown);
+
+        // Append the dropdownDiv to the chatMessages
+        chatMessages.appendChild(dropdownDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // Add event listener for dropdown selection
+        dropdown.addEventListener("change", () => {
+            const selectedIndex = dropdown.value;
+            const selectedOption = options[selectedIndex];
+            if (selectedOption && selectedOption.callback) {
+                addMessage(selectedOption.text, "user");
+                selectedOption.callback();
+            }
+        });
+    }
+     faqButton.addEventListener("click", () => {
+                addMessage(
+                    "Here are the Frequently Asked Questions (FAQ):\n" +
+                    "1. What courses are offered?\n" +
+                    "2. What are the tuition fees?\n" +
+                    "3. How can I apply?\n" +
+                    "4. What is the minimum entry requirement for a specific program?",
+                    "bot"
+                );
+            });
+
+            feedbackButton.addEventListener("click", () => {
+                addMessage(
+                    "We value your feedback! Please type your feedback in the chat box and press Enter to send it to us. Your feedback is important to us!",
+                    "bot"
+                );
+            });
+
+
+    async function fetchBotResponse(query) {
+        try {
+            const response = await fetch("/run_flow", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ message: query }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.bot_response) {
+                    addMessage(data.bot_response, "bot");
+                } else {
+                    addMessage("Sorry, I could not process your request.", "bot");
+                }
+            } else {
+                throw new Error(`Server error: ${response.status}`);
+            }
+        } catch (error) {
+            console.error(error);
+            addMessage("Error connecting to the server. Please try again later.", "bot");
+        }
+    }
+
+    // Welcome message
+    addMessage("👋 Welcome to TAR BOT! How can I assist you?", "bot");
+
+    // Ask if user is a TAR UMT student
+    setTimeout(() => {
+        addDropdown("Are you a TAR UMT student?", [
+            {
+                text: "No ",
+                callback: () => {
+                    addDropdown("For Your Information:", [
+                        {
+                            text: "Fees Information",
+                            callback: () => fetchBotResponse("What is the tuition fee for diploma and degree programs?"),
+                        },
+                        {
+                            text: "Minimum Entry Requirements (MER)",
+                            callback: () => fetchBotResponse("What are the entry requirements for diploma and degree programs?"),
+                        },
+                        {
+                            text: "Programme offer",
+                            callback: () => {
+                                addDropdown("Programme offer Options:", [
+                                    {
+                                        text: "Interest in diploma ?",
+                                        callback: () =>
+                                            fetchBotResponse("What programs are offered for diploma?"),
+                                    },
+                                    {
+                                        text: "Interest in degree ?",
+                                        callback: () =>
+                                            fetchBotResponse("What programs are offered for degree?"),
+                                    },
+                                ]);
+                            },
+                        },
+                        {
+                            text: "Career Prospects",
+                            callback: () => fetchBotResponse("What are the career prospects for graduates?"),
+                        },
+                    ]);
+                },
+            },
+            {
+                text: "Yes",
+                callback: () => {
+                    addDropdown("For Current Students:", [
+                        {
+                            text: "Academic Regulations",
+                            callback: () => {
+                                addDropdown("Academic Regulations Options:", [
+                                    {
+                                        text: "What are the academic regulations for specific courses?",
+                                        callback: () =>
+                                            fetchBotResponse(
+                                                "What are the academic regulations for specific courses?"
+                                            ),
+                                    },
+                                    {
+                                        text: "What happens if I fail a subject?",
+                                        callback: () =>
+                                            fetchBotResponse("What happens if I fail a subject?"),
+                                    },
+                                ]);
+                            },
+                        },
+                        {
+                            text: "Fees Information",
+                            callback: () => {
+                                addDropdown("Fees Information Options:", [
+                                    {
+                                        text: "What is the tuition fee for current students?",
+                                        callback: () =>
+                                            fetchBotResponse("What is the tuition fee for current students?"),
+                                    },
+                                    {
+                                        text: "When are the fees due?",
+                                        callback: () => fetchBotResponse("When are the fees due?"),
+                                    },
+                                ]);
+                            },
+                        },
+                        {
+                            text: "Courses Offerings",
+                            callback: () => fetchBotResponse("Tell me about the courses offered."),
+                        },
+                    ]);
+                },
+            },
+        ]);
+    }, 1000);
+});
+
+
+
+
+
+    </script>
+</body>
+</html>
